@@ -7,7 +7,7 @@ const checkStatus = (response) => {
 
 const json = (response) => response.json();
 
-// To Do List component stores basic layout of web page and event listeners
+// To Do List component stores basic layout of web page and input event listeners
 class ToDoList extends React.Component {
   constructor(props) {
     super(props);
@@ -18,6 +18,21 @@ class ToDoList extends React.Component {
 
      this.handleChange = this.handleChange.bind(this);
      this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  // runs after component has loaded
+  componentDidMount() {
+    // fetch tasks from API
+    fetch('https://fewd-todolist-api.onrender.com/tasks?api_key=317')
+      .then(checkStatus)
+      .then(json)
+      .then((response) => {
+        console.log(response);
+        this.setState({tasks: response.tasks});
+      })
+      .catch(error => {
+        console.error(error.message);
+      })
   }
 
   handleChange(event) {
