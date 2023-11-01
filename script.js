@@ -12,12 +12,16 @@ class Task extends React.Component {
   render() {
     const { task, onDelete, onComplete } = this.props;
     const { id, content, completed } = task;
+    // mute text if task is marked complete
+    const cName = completed ? 'col-6 text-muted' : 'col-6';
     return (
       <div className='row mb-1'>
-        <p className='col'>{content}</p>
-        <button onClick={() => onDelete(id)}>Delete</button>
+        <p className={cName}>{content}</p>
+        <button className='btn btn-danger' onClick={() => onDelete(id)}>
+          Delete
+        </button>
         <input
-          className='d-inline-block mt-2'
+          className='d-inline-block mt-2 ml-2'
           type='checkbox'
           onChange={() => onComplete(id, completed)}
           checked={completed}
@@ -39,6 +43,7 @@ class ToDoList extends React.Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.fetchTasks = this.fetchTasks.bind(this);
     this.deleteTask = this.deleteTask.bind(this);
     this.toggleComplete = this.toggleComplete.bind(this);
     this.toggleFilter = this.toggleFilter.bind(this);
@@ -166,7 +171,9 @@ class ToDoList extends React.Component {
       <div className='container'>
         <div className='row'>
           <div className='col-12'>
-            <h2 className='mb-3'>To Do List</h2>
+            <h2 className='mb-3'>
+              <u>To Do List</u>
+            </h2>
             {tasks.length > 0 ? (
               tasks
                 .filter((task) => {
@@ -188,14 +195,14 @@ class ToDoList extends React.Component {
             )}
             {/* task filter elements */}
             <div className='mt-3'>
-              <label className='ml-3'>
+              <label className={filter==='all' ? 'ml-3' : 'ml-3 text-muted'}>
                 <input type='checkbox' name='all' checked={filter === 'all'} onChange={this.toggleFilter} /> All
               </label>
-              <label className='ml-3'>
+              <label className={filter==='active' ? 'ml-3' : 'ml-3 text-muted'}>
                 <input type='checkbox' name='active' checked={filter === 'active'} onChange={this.toggleFilter} />{' '}
                 Active
               </label>
-              <label className='ml-3'>
+              <label className={filter==='completed' ? 'ml-3' : 'ml-3 text-muted'}>
                 <input type='checkbox' name='completed' checked={filter === 'completed'} onChange={this.toggleFilter} />{' '}
                 Completed
               </label>
