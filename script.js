@@ -39,6 +39,7 @@ class ToDoList extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.deleteTask = this.deleteTask.bind(this);
+    this.toggleComplete = this.toggleComplete.bind(this);
   }
 
   // fetch the tasks from the API
@@ -64,6 +65,31 @@ class ToDoList extends React.Component {
     // make request to delete task
     fetch(`https://fewd-todolist-api.onrender.com/tasks/${id}?api_key=317`, {
       method: 'DELETE',
+      mode: 'cors',
+    })
+      .then(checkStatus) //check request status
+      .then(json) // process response data
+      .then((data) => {
+        // if request successful
+        this.fetchTasks();
+        console.log(id);
+      })
+      .catch((error) => {
+        // if error thrown
+        this.setState({ error: error.message });
+        console.log(error);
+      });
+  }
+
+  toggleComplete(id, completed) {
+    // early return if no id
+    if(!id){return}
+    // set state of task 
+    const newState = completed ? 'active' : 'complete';
+
+    // request to mark task as completed or active
+    fetch(`https://fewd-todolist-api.onrender.com/tasks/${id}/mark_${newState}?api_key=317`, {
+      method: 'PUT',
       mode: 'cors',
     })
       .then(checkStatus) //check request status
@@ -135,7 +161,7 @@ class ToDoList extends React.Component {
             {tasks.length > 0 ? (
               tasks.map((task) => {
                 // render each task
-                return <Task key={task.id} task={task} onDelete={this.deleteTask} />;
+                return <Task key={task.id} task={task} onDelete={this.deleteTask} onComplete={this.toggleComplete}/>;
               })
             ) : (
               <p>No tasks here</p>
