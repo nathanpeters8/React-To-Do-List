@@ -40,9 +40,8 @@ class ToDoList extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  // runs after component has loaded
-  componentDidMount() {
-    // fetch tasks from API
+  // fetch the tasks from the API
+  fetchTasks() {
     fetch('https://fewd-todolist-api.onrender.com/tasks?api_key=317')
       .then(checkStatus)
       .then(json)
@@ -55,12 +54,49 @@ class ToDoList extends React.Component {
       });
   }
 
+  // runs after component has loaded
+  componentDidMount() {
+    // fetch tasks from API
+    this.fetchTasks();
+  }
+
   handleChange(event) {
     this.setState({ new_task: event.target.value });
   }
 
   handleSubmit(event) {
     event.preventDefault();
+
+    // get new task from component state
+    let { new_task } = this.state;
+    new_task = new_task.trim();
+    // early return if input element is empty
+    if(!new_task) {
+      return;
+    }
+    // post new task into API
+    fetch("https://fewd-todolist-api.onrender.com/tasks?api_key=317", {
+      method: "POST",
+      mode: "cors",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        task: {
+          content: new_task
+        }
+      })
+    }).then(checkStatus) //check request status
+      .then(json) // process response data
+      .then((data) => {
+        // if request successful
+        this.setState({new_task: ''});
+        this.fetchTasks();
+      })
+      .catch((error) => {
+        // if error thrown
+        this.setState({error: error.message});
+        console.log(error);
+      })
+    
   }
 
   render() {
@@ -73,7 +109,7 @@ class ToDoList extends React.Component {
             {tasks.length > 0 ? (
               tasks.map((task) => {
                 // render each task
-                return <Task key={task.id} task={task}/>
+                return <Task key={task.id} task={task} />;
               })
             ) : (
               <p>No tasks here</p>
