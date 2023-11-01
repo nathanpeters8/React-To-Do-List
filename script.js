@@ -38,6 +38,7 @@ class ToDoList extends React.Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.deleteTask = this.deleteTask.bind(this);
   }
 
   // fetch the tasks from the API
@@ -51,6 +52,31 @@ class ToDoList extends React.Component {
       })
       .catch((error) => {
         console.error(error.message);
+      });
+  }
+
+  deleteTask(id) {
+    // early return if no id supplied
+    if (!id) {
+      return;
+    }
+
+    // make request to delete task
+    fetch(`https://fewd-todolist-api.onrender.com/tasks/${id}?api_key=317`, {
+      method: 'DELETE',
+      mode: 'cors',
+    })
+      .then(checkStatus) //check request status
+      .then(json) // process response data
+      .then((data) => {
+        // if request successful
+        this.fetchTasks();
+        console.log(id);
+      })
+      .catch((error) => {
+        // if error thrown
+        this.setState({ error: error.message });
+        console.log(error);
       });
   }
 
@@ -71,32 +97,32 @@ class ToDoList extends React.Component {
     let { new_task } = this.state;
     new_task = new_task.trim();
     // early return if input element is empty
-    if(!new_task) {
+    if (!new_task) {
       return;
     }
     // post new task into API
-    fetch("https://fewd-todolist-api.onrender.com/tasks?api_key=317", {
-      method: "POST",
-      mode: "cors",
-      headers: {"Content-Type": "application/json"},
+    fetch('https://fewd-todolist-api.onrender.com/tasks?api_key=317', {
+      method: 'POST',
+      mode: 'cors',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         task: {
-          content: new_task
-        }
-      })
-    }).then(checkStatus) //check request status
+          content: new_task,
+        },
+      }),
+    })
+      .then(checkStatus) //check request status
       .then(json) // process response data
       .then((data) => {
         // if request successful
-        this.setState({new_task: ''});
+        this.setState({ new_task: '' });
         this.fetchTasks();
       })
       .catch((error) => {
         // if error thrown
-        this.setState({error: error.message});
+        this.setState({ error: error.message });
         console.log(error);
-      })
-    
+      });
   }
 
   render() {
@@ -109,7 +135,7 @@ class ToDoList extends React.Component {
             {tasks.length > 0 ? (
               tasks.map((task) => {
                 // render each task
-                return <Task key={task.id} task={task} />;
+                return <Task key={task.id} task={task} onDelete={this.deleteTask} />;
               })
             ) : (
               <p>No tasks here</p>
